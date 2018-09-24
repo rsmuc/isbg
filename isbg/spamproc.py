@@ -432,6 +432,28 @@ class SpamAssassin(object):
                 self.imap.uid("COPY", uid, self.imapsets.spaminbox)
 
         return True
+        
+    def _process_ham(self, uid, score, mail):
+        self.logger.debug(__("{} is ham".format(uid)))
+
+        if self.dryrun:
+            self.logger.info("Skipping report because of --dryrun")
+        else:
+            new_mail, code = feed_mail(mail, cmd=self.cmd_save)
+            
+            # write the subject, the X-Spam-Report (if available in header) and the X-Spam-Status to logfile
+            subject = mail.get("subject")
+            received = mail.get("Date")
+            import email
+            new_mail = email.message_from_string(new_mail)
+            report = new_mail.get("X-Spam-Report")            
+            status = new_mail.get("X-Spam-Status")
+            
+            import logging
+            logging.basicConfig(filename='/var/log/hamtest.log',level=logging.INFO)
+            logging.info("E-Mail Subject: " + subject + "\n" + "Date: " + received + "\n" + status + "\n" + report + "\n\n---------\n\n")
+        
+        return False
 
     def process_inbox(self, origpastuids):
         """Run spamassassin in the folder for spam."""
@@ -502,6 +524,11 @@ class SpamAssassin(object):
                 if not self._process_spam(uid, score, mail, spamdeletelist):
                     continue
                 spamlist.append(uid)
+            if code == 0:           
+                self._process_ham(uid, score, mail)
+                #continue
+                #hamlist.append(uid)
+                
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)
