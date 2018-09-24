@@ -284,6 +284,7 @@ class ISBG(object):
         self.verbose_mails, self._verbose = (False, False)
         self._set_loglevel(logging.INFO)
         # Processing options:
+        self.hamreport = "/var/log/ham.log"
         self.dryrun, self.maxsize, self.teachonly = (False, 120000, False)
         self.spamc, self.gmail = (False, False)
         # spamassassin options:

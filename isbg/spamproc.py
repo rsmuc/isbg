@@ -187,7 +187,7 @@ class SpamAssassin(object):
     #: Key args that will be used.
     _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
-               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
+               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize', 'hamreport',
                'noreport', 'spamflags', 'delete', 'expunge']
 
     def __init__(self, **kwargs):
@@ -450,7 +450,7 @@ class SpamAssassin(object):
             status = new_mail.get("X-Spam-Status")
             
             import logging
-            logging.basicConfig(filename='/var/log/hamtest.log',level=logging.INFO)
+            logging.basicConfig(filename=self.hamreport,level=logging.INFO)
             logging.info("E-Mail Subject: " + subject + "\n" + "Date: " + received + "\n" + status + "\n" + report + "\n\n---------\n\n")
         
         return False
@@ -524,11 +524,9 @@ class SpamAssassin(object):
                 if not self._process_spam(uid, score, mail, spamdeletelist):
                     continue
                 spamlist.append(uid)
-            if code == 0:           
-                self._process_ham(uid, score, mail)
-                #continue
-                #hamlist.append(uid)
-                
+            if code == 0 and self.hamreport:
+                # Message is no spam. Write the SPAM report to logfile           
+                self._process_ham(uid, score, mail)              
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)

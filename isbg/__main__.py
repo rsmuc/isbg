@@ -100,6 +100,7 @@ Command line Options::
   --lockfilegrace=<min>  Set the lifetime of the lock file
                          [default: 240.0].
   --lockfilename file    Override the lock file name.
+  --hamreport file       Write report for HAMS to logfile
   --maxsize numbytes     Messages larger than this will be ignored as
                          they are unlikely to be spam.
   --movehamto mbox       Move ham to folder.
@@ -203,6 +204,8 @@ def parse_args(sbg):
         sbg.interactive = 0
 
     sbg.noreport = opts.get('--noreport', sbg.noreport)
+    
+    sbg.hamreport = opts.get('--hamreport', sbg.hamreport)
 
     sbg.lockfilename = opts.get('--lockfilename', sbg.lockfilename)
 
