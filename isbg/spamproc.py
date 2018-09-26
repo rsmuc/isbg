@@ -38,6 +38,7 @@ from isbg import utils
 from .utils import __
 
 import logging
+import datetime
 import email
 
 #: Used to detect already our successfully (un)learned messages.
@@ -450,6 +451,7 @@ class SpamAssassin(object):
             status = new_mail.get("X-Spam-Status")
             
             logging.basicConfig(filename=self.hamreport,level=logging.INFO)
+            logging.info(datetime.datetime.now())
             logging.info("E-Mail Subject: " + subject + "\n" + "Date: " + received + "\n" + status + "\n" + report + "\n\n---------\n\n")
         
         return False
