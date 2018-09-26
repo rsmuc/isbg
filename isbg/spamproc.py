@@ -525,9 +525,9 @@ class SpamAssassin(object):
                 if not self._process_spam(uid, score, mail, spamdeletelist):
                     continue
                 spamlist.append(uid)
-            if code == 0 and self.hamreport:
-                # Message is no spam. Write the SPAM report to logfile           
-                self._process_ham(uid, score, mail)              
+            if self.hamreport:
+                # Message is no spam. Write the SPAM report to logfile
+                self._process_ham(uid, score, mail)
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)
