@@ -96,8 +96,8 @@ OPTIONS
 **--noreport**
     Don't include the SpamAssassin report in the message copied to your
     spam folder
-**--hamreport file**
-    Write the SpamAssassin report for Non-SPAM messages in a logfile.
+**--mailreport file**
+    Write the SpamAssassin report for all messages in a logfile.
     Requires that "add_header all Report _REPORT_" and
     "add_header all Status _YESNO_, score=_SCORE_ required=_REQD_ tests=_TESTS_
     autolearn=_AUTOLEARN_ version=_VERSION_" are added to the SpamAssassin

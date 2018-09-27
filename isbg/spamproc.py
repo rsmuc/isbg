@@ -189,7 +189,7 @@ class SpamAssassin(object):
     #: Key args that will be used.
     _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
-               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize', 'hamreport',
+               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize', 'mailreport',
                'noreport', 'spamflags', 'delete', 'expunge']
 
     def __init__(self, **kwargs):
@@ -441,18 +441,21 @@ class SpamAssassin(object):
         if self.dryrun:
             self.logger.info("Skipping report because of --dryrun")
         else:
-            new_mail, code = feed_mail(mail, cmd=self.cmd_save)
-            
-            # write the subject, the X-Spam-Report (if available in header) and the X-Spam-Status to logfile
-            subject = mail.get("subject")
-            received = mail.get("Date")
-            new_mail = email.message_from_string(new_mail)
-            report = new_mail.get("X-Spam-Report")            
-            status = new_mail.get("X-Spam-Status")
-            
-            logging.basicConfig(filename=self.hamreport,level=logging.INFO)
-            logging.info(datetime.datetime.now())
-            logging.info("E-Mail Subject: " + subject + "\n" + "Date: " + received + "\n" + status + "\n" + report + "\n\n---------\n\n")
+            try:
+                new_mail, code = feed_mail(mail, cmd=self.cmd_save)
+
+                # write the subject, the X-Spam-Report (if available in header) and the X-Spam-Status to logfile
+                subject = mail.get("subject")
+                received = mail.get("Date")
+                new_mail = email.message_from_string(new_mail)
+                report = new_mail.get("X-Spam-Report")
+                status = new_mail.get("X-Spam-Status")
+
+                logging.basicConfig(filename=self.mailreport,level=logging.INFO)
+                logging.info(datetime.datetime.now())
+                logging.info("\n\n---------\n\n E-Mail Subject: " + str(subject) + "\n" + "Date: " + str(received) + "\n" + str(status) + "\n" + str(report) + "\n\n---------\n\n")
+            except UnicodeError:
+                logging.info("Logging error - skip logging")
         
         return False
 
@@ -525,7 +528,8 @@ class SpamAssassin(object):
                 if not self._process_spam(uid, score, mail, spamdeletelist):
                     continue
                 spamlist.append(uid)
-            if self.hamreport:
+
+            if self.mailreport:
                 # Message is no spam. Write the SPAM report to logfile
                 self._process_ham(uid, score, mail)
 
