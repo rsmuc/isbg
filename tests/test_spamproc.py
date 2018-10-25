@@ -89,7 +89,7 @@ def test_test_mail():
     if cmd_exists('spamc'):
         # We test the mail with spamc:
         score1, code1 = spamproc.test_mail(mail, True)
-        score2, code2 = spamproc.test_mail(mail, cmd=["spamc", "-c"])
+        score2, code2 = spamproc.test_mail(mail, cmd=["spamc", "-E"])
         assert score1 == score2, "The score should be the same."
         assert code1 == code2, "The return code should be the same."
         score, code = spamproc.test_mail("", True)
@@ -101,7 +101,7 @@ def test_test_mail():
             spamproc.test_mail(mail, True)
         with pytest.raises(OSError, match="No such file",
                            message="Should rise OSError."):
-            spamproc.test_mail(mail, cmd=["spamc", "-c"])
+            spamproc.test_mail(mail, cmd=["spamc", "-E"])
 
     if cmd_exists('spamassassin'):
         # We test the mail with spamassassin:
