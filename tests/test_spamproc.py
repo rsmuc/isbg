@@ -309,7 +309,7 @@ class Test_SpamAssassin(object):
 
         sa.noreport = True
         sa.deletehigherthan = 2
-        sa._process_spam(1, u"3/10\n", "", [])
+        sa._process_spam(1, u"3/10\n", "", [], 0, "")
 
     def test_process_inbox(self):
         """Test process_inbox."""
