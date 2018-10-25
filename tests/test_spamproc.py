@@ -305,7 +305,7 @@ class Test_SpamAssassin(object):
         # OSError required when it's run without spamassassin (travis-cl)
         with pytest.raises((AttributeError, OSError, MessageError),
                            message="Should rise error, IMAP not created."):
-            sa._process_spam(1, u"3/10\n", "", [])
+            sa._process_spam(1, u"3/10\n", "", [], 0, "")
 
         sa.noreport = True
         sa.deletehigherthan = 2
