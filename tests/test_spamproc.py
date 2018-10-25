@@ -244,7 +244,7 @@ class Test_SpamAssassin(object):
         sa = spamproc.SpamAssassin()
         assert sa.cmd_test == ["spamassassin", "--exit-code"]
         sa.spamc = True
-        assert sa.cmd_test == ["spamc", "-c"]
+        assert sa.cmd_test == ["spamc", "-E"]
         sa.spamc = False
         assert sa.cmd_test == ["spamassassin", "--exit-code"]
 
