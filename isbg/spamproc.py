@@ -116,6 +116,7 @@ def test_mail(mail, spamc=False, cmd=False):
     """Test a email with spamassassin."""
     score = "0/0\n"
     orig_code = None
+    spamassassin_result = None
 
     try:
         spamassassin_result, returncode = exec_spamassassin(mail, spamc, cmd)
