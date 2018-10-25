@@ -88,11 +88,11 @@ def test_test_mail():
 
     if cmd_exists('spamc'):
         # We test the mail with spamc:
-        score1, code1 = spamproc.test_mail(mail, True)
-        score2, code2 = spamproc.test_mail(mail, cmd=["spamc", "-E"])
+        score1, code1, spamassassin_result = spamproc.test_mail(mail, True)
+        score2, code2, spamassassin_result = spamproc.test_mail(mail, cmd=["spamc", "-E"])
         assert score1 == score2, "The score should be the same."
         assert code1 == code2, "The return code should be the same."
-        score, code = spamproc.test_mail("", True)
+        score, code, spamassassin_result = spamproc.test_mail("", True)
         assert score == u'-9999', 'It should return a error'
         assert code is None, 'It should return a error'
     else:
@@ -105,12 +105,12 @@ def test_test_mail():
 
     if cmd_exists('spamassassin'):
         # We test the mail with spamassassin:
-        score3, code3 = spamproc.test_mail(mail, False)
-        score4, code4 = spamproc.test_mail(mail, cmd=["spamassassin",
+        score3, code3, spamassassin_result = spamproc.test_mail(mail, False)
+        score4, code4, spamassassin_result = spamproc.test_mail(mail, cmd=["spamassassin",
                                                       "--exit-code"])
         assert score3 == score4, "The score should be the same."
         assert code3 == code4, "The return code should be the same."
-        score, code = spamproc.test_mail("", False)
+        score, code, spamassassin_result = spamproc.test_mail("", False)
         assert score == u'-9999', 'It should return a error'
         assert code is None, 'It should return a error'
     else:
@@ -122,7 +122,7 @@ def test_test_mail():
             spamproc.test_mail(mail, cmd=["spamassassin", "--exit-code"])
 
     # We try a random cmds (existant and unexistant):
-    score, code = spamproc.test_mail("", cmd=["echo"])
+    score, code, spamassassin_result = spamproc.test_mail("", cmd=["echo"])
     assert score == u'-9999', 'It should return a error'
     assert code is None, 'It should return a error'
     with pytest.raises(OSError, match="No such file",
