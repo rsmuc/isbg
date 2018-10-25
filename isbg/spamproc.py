@@ -97,7 +97,7 @@ def test_mail(mail, spamc=False, cmd=False):
     score = "0/0\n"
     orig_code = None
     spamassassin_result = None
-    returncode = -9999
+    returncode = None
 
     if cmd:
         satest = cmd
