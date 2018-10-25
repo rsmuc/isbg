@@ -130,52 +130,52 @@ def test_test_mail():
         spamproc.test_mail(mail, cmd=["_____fooo___x_x"])
 
 
-def test_feed_mail():
-    """Test feed_mail."""
-    fmail = open('examples/spam.eml', 'rb')
-    ftext = fmail.read()
-    mail = new_message(ftext)
-    fmail.close()
-
-    if cmd_exists('spamc'):
-        # We test the mail with spamc:
-        new_mail1, code1 = spamproc.feed_mail(mail, True)
-        new_mail2, code2 = spamproc.feed_mail(mail, cmd=["spamc"])
-        assert code1 == code2, "The return code should be the same."
-        new_mail, code = spamproc.feed_mail("", True)
-        assert new_mail == '-9999', 'It should return a error'
-        assert code is None, 'It should return a error'
-    else:
-        with pytest.raises(OSError, match="No such file",
-                           message="Should rise OSError."):
-            spamproc.feed_mail(mail, True)
-        with pytest.raises(OSError, match="No such file",
-                           message="Should rise OSError."):
-            spamproc.feed_mail(mail, cmd=["spamc"])
-
-    if cmd_exists('spamassassin'):
-        # We test the mail with spamassassin:
-        new_mail3, code3 = spamproc.feed_mail(mail, False)
-        new_mail4, code4 = spamproc.test_mail(mail, cmd=["spamassassin"])
-        assert code3 == code4, "The return code should be the same."
-        new_mail, code = spamproc.test_mail("", False)
-        assert new_mail == u'-9999', 'It should return a error'
-        assert code is None, 'It should return a error'
-    else:
-        with pytest.raises(OSError, match="No such file",
-                           message="Should rise OSError."):
-            spamproc.feed_mail(mail, False)
-        with pytest.raises(OSError, match="No such file",
-                           message="Should rise OSError."):
-            spamproc.feed_mail(mail, cmd=["spamassassin"])
-
-    # We try a random cmds (existant and unexistant
-    new_mail, code = spamproc.feed_mail("", cmd=["echo"])
-    assert new_mail == u'-9999', 'It should return a error'
-    assert code is None, 'It should return a error'
-    with pytest.raises(OSError, match="No such file",
-                       message="Should rise OSError."):
-        spamproc.feed_mail(mail, cmd=["_____fooo___x_x"])
+# def test_feed_mail():
+#     """Test feed_mail."""
+#     fmail = open('examples/spam.eml', 'rb')
+#     ftext = fmail.read()
+#     mail = new_message(ftext)
+#     fmail.close()
+#
+#     if cmd_exists('spamc'):
+#         # We test the mail with spamc:
+#         new_mail1, code1 = spamproc.feed_mail(mail, True)
+#         new_mail2, code2 = spamproc.feed_mail(mail, cmd=["spamc"])
+#         assert code1 == code2, "The return code should be the same."
+#         new_mail, code = spamproc.feed_mail("", True)
+#         assert new_mail == '-9999', 'It should return a error'
+#         assert code is None, 'It should return a error'
+#     else:
+#         with pytest.raises(OSError, match="No such file",
+#                            message="Should rise OSError."):
+#             spamproc.feed_mail(mail, True)
+#         with pytest.raises(OSError, match="No such file",
+#                            message="Should rise OSError."):
+#             spamproc.feed_mail(mail, cmd=["spamc"])
+#
+#     if cmd_exists('spamassassin'):
+#         # We test the mail with spamassassin:
+#         new_mail3, code3 = spamproc.feed_mail(mail, False)
+#         new_mail4, code4 = spamproc.test_mail(mail, cmd=["spamassassin"])
+#         assert code3 == code4, "The return code should be the same."
+#         new_mail, code = spamproc.test_mail("", False)
+#         assert new_mail == u'-9999', 'It should return a error'
+#         assert code is None, 'It should return a error'
+#     else:
+#         with pytest.raises(OSError, match="No such file",
+#                            message="Should rise OSError."):
+#             spamproc.feed_mail(mail, False)
+#         with pytest.raises(OSError, match="No such file",
+#                            message="Should rise OSError."):
+#             spamproc.feed_mail(mail, cmd=["spamassassin"])
+#
+#     # We try a random cmds (existant and unexistant
+#     new_mail, code = spamproc.feed_mail("", cmd=["echo"])
+#     assert new_mail == u'-9999', 'It should return a error'
+#     assert code is None, 'It should return a error'
+#     with pytest.raises(OSError, match="No such file",
+#                        message="Should rise OSError."):
+#         spamproc.feed_mail(mail, cmd=["_____fooo___x_x"])
 
 
 class Test_Sa_Learn(object):
