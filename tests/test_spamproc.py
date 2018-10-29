@@ -160,7 +160,7 @@ class Test_SpamAssassin(object):
 
     _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
-               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
+               'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize', 'mailreport',
                'noreport', 'spamflags', 'delete', 'expunge']
 
     def test__kwars(self):
