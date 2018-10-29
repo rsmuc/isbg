@@ -411,19 +411,19 @@ class SpamAssassin(object):
 
         return True
         
-    def _process_ham(self, uid, score, mail):
-        self.logger.debug(__("{} is ham".format(uid)))
+    def _write_report(self, uid, score, spamassassin_report):
+        """
+        write an entry to the mail report
+        """
 
         if self.dryrun:
             self.logger.info("Skipping report because of --dryrun")
         else:
             try:
-                new_mail, code = feed_mail(mail, cmd=self.cmd_save)
-
                 # write the subject, the X-Spam-Report (if available in header) and the X-Spam-Status to logfile
-                subject = mail.get("subject")
-                received = mail.get("Date")
-                new_mail = email.message_from_string(new_mail)
+                new_mail = email.message_from_string(spamassassin_report)
+                subject = new_mail.get("subject")
+                received = new_mail.get("Date")
                 report = new_mail.get("X-Spam-Report")
                 status = new_mail.get("X-Spam-Status")
 
@@ -432,8 +432,7 @@ class SpamAssassin(object):
                 logging.info("\n\n---------\n\n E-Mail Subject: " + str(subject) + "\n" + "Date: " + str(received) + "\n" + str(status) + "\n" + str(report) + "\n\n---------\n\n")
             except UnicodeError:
                 logging.info("Logging error - skip logging")
-        
-        return False
+
 
     def process_inbox(self, origpastuids):
         """Run spamassassin in the folder for spam."""
@@ -506,8 +505,8 @@ class SpamAssassin(object):
                 spamlist.append(uid)
 
             if self.mailreport:
-                # Message is no spam. Write the SPAM report to logfile
-                self._process_ham(uid, score, mail)
+                # create a logfile entry
+                self._write_report(uid, score, spamassassin_result)
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)
