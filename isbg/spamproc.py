@@ -385,8 +385,12 @@ class SpamAssassin(object):
                         spamdeletelist.remove(uid)
                     return False
 
-                res = self.imap.append(self.imapsets.spaminbox, None, None,
-                                       new_mail)
+                try:
+                    #TODO: in python3 a TypeError may rise. Working around that issue
+                    res = self.imap.append(self.imapsets.spaminbox, None, None, new_mail)
+                except TypeError:
+                    self.logger.info("TypeError in append - Using workaround")
+                    res = self.imap.append(self.imapsets.spaminbox.encode('utf-8'), None, None, new_mail.encode('utf-8'))
                 # The above will fail on some IMAP servers for various
                 # reasons. We print out what happened and continue
                 # processing
