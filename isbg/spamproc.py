@@ -112,10 +112,10 @@ def test_mail(mail, spamc=False, cmd=False):
 
     try:
         spamassassin_result = proc.communicate(imaputils.mail_content(mail)
-                                               )[0].decode(errors='ignore')
+                                               )[0]
         returncode = proc.returncode
         proc.stdin.close()
-        score = utils.score_from_mail(spamassassin_result)
+        score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
     except Exception:  # pylint: disable=broad-except
         score = "-9999"
@@ -425,7 +425,7 @@ class SpamAssassin(object):
         else:
             try:
                 # write the subject, the X-Spam-Report (if available in header) and the X-Spam-Status to logfile
-                new_mail = email.message_from_string(spamassassin_report)
+                new_mail = email.message_from_string(spamassassin_report.decode(errors='ignore'))
                 subject = new_mail.get("subject")
                 received = new_mail.get("Date")
                 report = new_mail.get("X-Spam-Report")
