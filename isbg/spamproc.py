@@ -38,6 +38,7 @@ from isbg import utils
 from .utils import __
 
 import logging
+import progressbar
 
 #: Used to detect already our successfully (un)learned messages.
 __spamc_msg__ = {
@@ -160,7 +161,7 @@ class SpamAssassin(object):
     _required_kwargs = []
 
     #: Key args that will be used.
-    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
+    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
                'noreport', 'spamflags', 'delete', 'expunge']
@@ -431,8 +432,21 @@ class SpamAssassin(object):
             fakespammax = 1
             processmax = 5
 
+        # progressbar
+        count = len(uids)
+        progress = False
+        # disable the progressbar if there are no new mails or --nointeractive is set
+        if count > 0 and self.interactive:
+            progress = True
+
+        if progress:
+            widgets = [progressbar.Percentage(), progressbar.Bar()]
+            bar = progressbar.ProgressBar(widgets=widgets, max_value=count).start()
+
         # Main loop that iterates over each new uid we haven't seen before
-        for uid in uids:
+        for i, uid in enumerate(uids):
+            if progress:
+                bar.update(i)
             # Retrieve the entire message
             mail = imaputils.get_message(self.imap, uid, sa_proc.uids,
                                          logger=self.logger)
@@ -477,6 +491,9 @@ class SpamAssassin(object):
                 if not self._process_spam(uid, score, mail, spamdeletelist, code, spamassassin_result):
                     continue
                 spamlist.append(uid)
+        if progress:
+            bar.finish()
+
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)
