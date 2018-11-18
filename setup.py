@@ -42,7 +42,7 @@ setup(
             'isbg_sa_unwrap = isbg.sa_unwrap:isbg_sa_unwrap',
         ]
     },
-    install_requires=['docopt', 'progressbar2'],
+    install_requires=['docopt'],
     extras_require={
         'chardet': ['chardet'],
         'cchardet': ['cchardet'],
