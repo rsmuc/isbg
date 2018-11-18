@@ -32,6 +32,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
+import sys
 import re
 from platform import python_version  # To check py version
 from subprocess import Popen, PIPE   # To call Popen
@@ -45,6 +46,26 @@ except ImportError:
         import chardet
     except ImportError:
         pass
+
+
+def progressbar(it, prefix="", size=60, interactive=False):
+    """ show a progressbar
+    based on: https://stackoverflow.com/a/34482761 """
+    count = len(it)
+    if count == 0 or not interactive:
+        return
+
+    def _show(_i):
+        x = int(size*_i/count)
+        sys.stdout.write("%s[%s%s] %i/%i\r" % (prefix, "#"*x, "."*(size-x), _i, count))
+        sys.stdout.flush()
+
+    _show(0)
+    for i, item in enumerate(it):
+        yield item
+        _show(i+1)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 
 def detect_enc(byte_sring):

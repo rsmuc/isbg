@@ -158,7 +158,7 @@ class Test_Sa_Process(object):
 class Test_SpamAssassin(object):
     """Tests for SpamAssassin."""
 
-    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
+    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
                'noreport', 'spamflags', 'delete', 'expunge']
