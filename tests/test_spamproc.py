@@ -161,7 +161,7 @@ class Test_SpamAssassin(object):
     _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
-               'noreport', 'spamflags', 'delete', 'expunge']
+               'noreport', 'spamflags', 'delete', 'expunge', 'rspamc']
 
     def test__kwars(self):
         """Test _kwargs is up to date."""

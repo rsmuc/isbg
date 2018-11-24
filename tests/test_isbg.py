@@ -56,11 +56,11 @@ class TestISBG(object):
     def test_set_filename(self):
         """Test set_filename."""
         sbg = isbg.ISBG()
-        filename = isbg.ISBG.set_filename(sbg.imapsets, "track")
+        filename = isbg.ISBG.set_filename(sbg.imapsets, "track", "isbg")
         assert os.path.dirname(filename) != ""
         assert os.path.basename(filename) != ""
         assert os.path.basename(filename).startswith("track")
-        filename = isbg.ISBG.set_filename(sbg.imapsets, "password")
+        filename = isbg.ISBG.set_filename(sbg.imapsets, "password", "isbg")
         assert os.path.dirname(filename) != ""
         assert os.path.basename(filename) != ""
         assert os.path.basename(filename).startswith(".isbg-")

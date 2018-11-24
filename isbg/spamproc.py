@@ -141,7 +141,7 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
             proc.stdin.close()
             score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
-    except TypeError:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         score = "-9999"
 
     return score, returncode, spamassassin_result
