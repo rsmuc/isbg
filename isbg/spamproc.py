@@ -48,7 +48,7 @@ __spamc_msg__ = {
 }
 
 
-def learn_mail(mail, learn_type):
+def learn_mail(mail, learn_type, rspamc=False):
     """Process a email and try to learn or unlearn it.
 
     Args:
@@ -74,7 +74,10 @@ def learn_mail(mail, learn_type):
     """
     out = ""
     orig_code = None
-    proc = utils.popen(["spamc", "--learntype=" + learn_type])
+    if rspamc:
+        proc = utils.popen(["rspamc", "learn_" + learn_type])
+    else:
+        proc = utils.popen(["spamc", "--learntype=" + learn_type])
     try:
         out = proc.communicate(imaputils.mail_content(mail))
         code = int(proc.returncode)
@@ -84,17 +87,27 @@ def learn_mail(mail, learn_type):
 
     proc.stdin.close()
 
+    out = out[0].decode(errors='ignore').strip()
+
     if code == 0:
-        out = out[0].decode(errors='ignore').strip()
         if out == __spamc_msg__['already']:
             code = 6
         elif out == __spamc_msg__['success']:
             code = 5
 
+    if rspamc and code == 0:
+        # sucessfully learned
+        code = 5
+        orig_code = 5
+    if rspamc and code == 1:
+        # already learned
+        code = 6
+        orig_code = 6
+
     return code, orig_code
 
 
-def test_mail(mail, spamc=False, cmd=False):
+def test_mail(mail, spamc=False, rspamc=False, cmd=False):
     """Test a email with spamassassin."""
     score = "0/0\n"
     orig_code = None
@@ -105,18 +118,30 @@ def test_mail(mail, spamc=False, cmd=False):
         satest = cmd
     elif spamc:
         satest = ["spamc", "-E"]
+    elif rspamc:
+        satest = ["rspamc", "-m"]
+
     else:
         satest = ["spamassassin", "--exit-code"]
 
     proc = utils.popen(satest)
 
     try:
-        spamassassin_result = proc.communicate(imaputils.mail_content(mail))[0]
-        returncode = proc.returncode
-        proc.stdin.close()
-        score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
-    except Exception:  # pylint: disable=broad-except
+        if rspamc:
+            spamassassin_result = proc.communicate(imaputils.mail_content(mail))[0]
+            returncode = utils.status_from_mail(spamassassin_result)
+
+            # faking score; we don't need it for rspamc
+            score = "2/5\n"
+
+        else:
+            spamassassin_result = proc.communicate(imaputils.mail_content(mail))[0]
+            returncode = proc.returncode
+            proc.stdin.close()
+            score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
+
+    except TypeError:  # pylint: disable=broad-except
         score = "-9999"
 
     return score, returncode, spamassassin_result
@@ -165,7 +190,7 @@ class SpamAssassin(object):
     _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
-               'noreport', 'spamflags', 'delete', 'expunge']
+               'noreport', 'spamflags', 'delete', 'expunge', 'rspamc']
 
     def __init__(self, **kwargs):
         """Initialize a SpamAssassin object."""
@@ -195,6 +220,8 @@ class SpamAssassin(object):
         """Is the command that dumps out a munged message including report."""
         if self.spamc:  # pylint: disable=no-member
             return ["spamc"]
+        elif self.rspamc:
+            return ["rspamc", "-m"]
         return ["spamassassin"]
 
     @property
@@ -202,6 +229,9 @@ class SpamAssassin(object):
         """Is the command to use to test if the message is spam."""
         if self.spamc:  # pylint: disable=no-member
             return ["spamc", "-E"]
+        elif self.rspamc:
+            return ["rspamc", "-m"]
+
         return ["spamassassin", "--exit-code"]
 
     @classmethod
@@ -311,11 +341,11 @@ class SpamAssassin(object):
                 self.logger.warning("Skipped learning due to dryrun!")
                 continue
             else:
-                code, code_orig = learn_mail(mail, learn_type)
+                code, code_orig = learn_mail(mail, learn_type, self.rspamc)
 
             if code == -9999:  # error processing email, try next.
                 self.logger.exception(__(
-                    'spamc error for mail {}'.format(uid)))
+                    'spamc error for mail 55 {}'.format(uid)))
                 self.logger.debug(repr(imaputils.mail_content(mail)))
                 continue
 
@@ -377,7 +407,7 @@ class SpamAssassin(object):
                 new_mail = spamassassin_result
                 if new_mail == u"-9999":
                     self.logger.exception(
-                        '{} error for mail {} (ret code {})'.format(
+                        '{} error for mail 44 {} (ret code {})'.format(
                             self.cmd_save, uid, code))
                     self.logger.debug(repr(imaputils.mail_content(mail)))
                     if uid in spamdeletelist:
@@ -460,10 +490,10 @@ class SpamAssassin(object):
                     code = 0
                 processednum = processednum + 1
             else:
-                score, code, spamassassin_result = test_mail(mail, cmd=self.cmd_test)
+                score, code, spamassassin_result = test_mail(mail, self.spamc, self.rspamc, cmd=self.cmd_test)
                 if score == "-9999":
                     self.logger.exception(__(
-                        '{} error for mail {}'.format(self.cmd_test, uids[i])))
+                        '{} error for mail  22 {}'.format(self.cmd_test, uids[i])))
                     self.logger.debug(repr(mail))
                     uids.remove(uids[i])
                     continue

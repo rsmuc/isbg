@@ -114,6 +114,8 @@ Command line Options::
   --savepw               Store the password to be used in future runs.
   --spamc                Use spamc instead of standalone SpamAssassin
                          binary.
+  --rspamc               Use spamc instead of standalone SpamAssassin
+                         binary.
   --spaminbox mbox       Name of your spam folder
                          [Default: INBOX.Spam].
   --nossl                Don't use SSL to connect to the IMAP server.
@@ -238,6 +240,7 @@ def parse_args(sbg):
 
     sbg.teachonly = opts.get('--teachonly', sbg.teachonly)
     sbg.spamc = opts.get('--spamc', sbg.spamc)
+    sbg.rspamc = opts.get('--rspamc', sbg.rspamc)
 
     sbg.exitcodes = opts.get('--exitcodes', sbg.exitcodes)
 

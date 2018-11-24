@@ -34,6 +34,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import re
+import email
 from platform import python_version  # To check py version
 from subprocess import Popen, PIPE   # To call Popen
 
@@ -264,6 +265,15 @@ def score_from_mail(mail):
     res = re.search(r"score=(-?\d+(?:\.\d+)?) required=(\d+(?:\.\d+)?)", mail)
     score = res.group(1) + "/" + res.group(2) + "\n"
     return score
+
+def status_from_mail(mail):
+    """ Search the spam status """
+    new_mail = email.message_from_string(mail.decode(errors='ignore'))
+    spamstatus = new_mail.get("X-Spam")
+    if spamstatus == "Yes":
+        return 1
+    else:
+        return 0
 
 
 def shorten(inp, length):
