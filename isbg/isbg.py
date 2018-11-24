@@ -275,9 +275,6 @@ class ISBG(object):
         self.logger = logging.getLogger(__name__)       #: a logger
         self.logger.addHandler(logging.StreamHandler())
 
-        # We create the dir for store cached information (if needed)
-        if not os.path.isdir(os.path.join(xdg_cache_home, "isbg")):
-            os.makedirs(os.path.join(xdg_cache_home, "isbg"))
 
         self.imaplist, self.nostats = (False, False)
         self.noreport, self.exitcodes = (False, True)
@@ -294,12 +291,16 @@ class ISBG(object):
         self.learnthendestroy, self.learnthenflag = (False, False)
         # Lockfile options:
         self.ignorelockfile = False
-        self.lockfilename = os.path.join(xdg_cache_home, "isbg", "lock")
+        self.cachepath = "isbg"
+        self.lockfilename = os.path.join(xdg_cache_home, self.cachepath, "lock")
         self.lockfilegrace = 240.0
         # Password options (a vague level of obfuscation):
         self.passwdfilename, self.savepw = (None, False)
         # Trackfile options:
         self.trackfile, self.partialrun = (None, 50)
+        # We create the dir for store cached information (if needed)
+        if not os.path.isdir(os.path.join(xdg_cache_home, self.cachepath)):
+            os.makedirs(os.path.join(xdg_cache_home, self.cachepath))
 
         try:
             self.interactive = sys.stdin.isatty()
@@ -313,7 +314,7 @@ class ISBG(object):
         self.spamflags = []
 
     @staticmethod
-    def set_filename(imapsets, filetype):
+    def set_filename(imapsets, filetype, cachepath):
         """Set the filename of cached created files.
 
         If `filetype` is password, the file name start with `.isbg-`, else
@@ -327,10 +328,14 @@ class ISBG(object):
             str: The full file path.
 
         """
+
+        if not os.path.isdir(os.path.join(xdg_cache_home, cachepath)):
+            os.makedirs(os.path.join(xdg_cache_home, cachepath))
+
         if filetype == "password":
-            filename = os.path.join(xdg_cache_home, "isbg", ".isbg-")
+            filename = os.path.join(xdg_cache_home, cachepath, ".isbg-")
         else:
-            filename = os.path.join(xdg_cache_home, "isbg", filetype)
+            filename = os.path.join(xdg_cache_home, cachepath, filetype)
         return filename + imapsets.hash.hexdigest()
 
     @property
@@ -391,7 +396,7 @@ class ISBG(object):
         the file)
         """
         if self.trackfile is None:
-            self.trackfile = ISBG.set_filename(self.imapsets, "track")
+            self.trackfile = ISBG.set_filename(self.imapsets, "track", self.cachepath)
         pastuids = []
         try:
             with open(self.trackfile + folder, 'r') as rfile:
@@ -406,7 +411,7 @@ class ISBG(object):
                       folder='inbox'):
         """Write the uids in a file for the folder."""
         if self.trackfile is None:
-            self.trackfile = ISBG.set_filename(self.imapsets, "track")
+            self.trackfile = ISBG.set_filename(self.imapsets, "track", self.cachepath)
 
         wfile = open(self.trackfile + folder, "w+")
         try:
@@ -561,10 +566,10 @@ class ISBG(object):
             self.spamflags.append("\\Deleted")
 
         if self.trackfile is None:
-            self.trackfile = ISBG.set_filename(self.imapsets, "track")
+            self.trackfile = ISBG.set_filename(self.imapsets, "track", self.cachepath)
 
         if self.passwdfilename is None:
-            self.passwdfilename = ISBG.set_filename(self.imapsets, "password")
+            self.passwdfilename = ISBG.set_filename(self.imapsets, "password", self.cachepath)
 
         self.logger.debug(__("Lock file is {}".format(self.lockfilename)))
         self.logger.debug(__("Trackfile starts with {}".format(self.trackfile))

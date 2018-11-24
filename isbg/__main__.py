@@ -121,6 +121,7 @@ Command line Options::
   --nossl                Don't use SSL to connect to the IMAP server.
   --teachonly            Don't search spam, just learn from folders.
   --trackfile file       Override the trackfile name.
+  --cachepath folder       Override the trackfile name.
   --verbose              Show IMAP stuff happening.
   --verbose-mails        Show mail bodies (extra-verbose).
 
@@ -182,6 +183,7 @@ def parse_args(sbg):
     sbg.imapsets.learnhambox = opts.get('--learnhambox')
     sbg.imapsets.nossl = opts.get('--nossl', sbg.imapsets.nossl)
 
+    sbg.cachepath = opts.get('--cachepath', sbg.cachepath)
     sbg.lockfilegrace = float(opts.get('--lockfilegrace', sbg.lockfilegrace))
 
     sbg.nostats = opts.get('--nostats', False)
