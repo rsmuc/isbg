@@ -114,14 +114,14 @@ Command line Options::
   --savepw               Store the password to be used in future runs.
   --spamc                Use spamc instead of standalone SpamAssassin
                          binary.
-  --rspamc               Use spamc instead of standalone SpamAssassin
+  --rspamc               Use rspamc instead of standalone SpamAssassin
                          binary.
   --spaminbox mbox       Name of your spam folder
                          [Default: INBOX.Spam].
   --nossl                Don't use SSL to connect to the IMAP server.
   --teachonly            Don't search spam, just learn from folders.
   --trackfile file       Override the trackfile name.
-  --cachepath folder       Override the trackfile name.
+  --cachepath folder     Override the cache folder name.
   --verbose              Show IMAP stuff happening.
   --verbose-mails        Show mail bodies (extra-verbose).
 
