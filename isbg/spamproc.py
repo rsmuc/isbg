@@ -132,9 +132,6 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
         if rspamc:
             spamassassin_result = proc.communicate(imaputils.mail_content(mail))[0]
             returncode = utils.status_from_mail(spamassassin_result)
-            #spamassassin_result = spamassassin_result.decode(errors='ignore')
-            #SpamAssassin.logger.warning(spamassassin_result)
-            #SpamAssassin.logger.warning("result")
 
             # faking score; we don't need it for rspamc
             score = "2/5\n"
@@ -146,7 +143,6 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
             score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
     except Exception:  # pylint: disable=broad-except
-        raise Exception
         score = "-9999"
 
     return score, returncode, spamassassin_result
@@ -350,7 +346,7 @@ class SpamAssassin(object):
 
             if code == -9999:  # error processing email, try next.
                 self.logger.exception(__(
-                    'spamc error for mail 55 {}'.format(uid)))
+                    'spamc error for mail {}'.format(uid)))
                 self.logger.debug(repr(imaputils.mail_content(mail)))
                 continue
 
@@ -412,7 +408,7 @@ class SpamAssassin(object):
                 new_mail = spamassassin_result
                 if new_mail == u"-9999":
                     self.logger.exception(
-                        '{} error for mail 44 {} (ret code {})'.format(
+                        '{} error for mail {} (ret code {})'.format(
                             self.cmd_save, uid, code))
                     self.logger.debug(repr(imaputils.mail_content(mail)))
                     if uid in spamdeletelist:
@@ -470,10 +466,8 @@ class SpamAssassin(object):
 
         # progressbar
         count = len(uids)
-        self.logger.info("Out of the loop")
         # Main loop that iterates over each new uid we haven't seen before
         for i in progressbar(range(count), "Scanning: ", 80, self.interactive):
-            self.logger.info("In the loop")
             # Retrieve the entire message
             mail = imaputils.get_message(self.imap, uids[i], sa_proc.uids,
                                          logger=self.logger)
@@ -497,12 +491,10 @@ class SpamAssassin(object):
                     code = 0
                 processednum = processednum + 1
             else:
-                self.logger.debug(__('Testing mail {}'.format(uids)))
                 score, code, spamassassin_result = test_mail(mail, self.spamc, self.rspamc, cmd=self.cmd_test)
-                self.logger.debug(__('Score {}'.format(score)))
                 if score == "-9999":
                     self.logger.exception(__(
-                        '{} error for mail  22 {}'.format(self.cmd_test, uids[i])))
+                        '{} error for mail {}'.format(self.cmd_test, uids[i])))
                     self.logger.debug(repr(mail))
                     uids.remove(uids[i])
                     continue

@@ -53,7 +53,7 @@ def progressbar(it, prefix="", size=60, interactive=False):
     """ show a progressbar
     based on: https://stackoverflow.com/a/34482761 """
     count = len(it)
-    if count != 0 or interactive:
+    if count != 0 and interactive:
         def _show(_i):
             x = int(size*_i/count)
             sys.stdout.write("%s[%s%s] %i/%i\r" % (prefix, "#"*x, "."*(size-x), _i, count))
