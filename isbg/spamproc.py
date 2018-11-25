@@ -87,19 +87,20 @@ def learn_mail(mail, learn_type, rspamc=False):
 
     proc.stdin.close()
 
-    out = out[0].decode(errors='ignore').strip()
-
     if code == 0:
+        out = out[0].decode(errors='ignore').strip()
         if out == __spamc_msg__['already']:
             code = 6
         elif out == __spamc_msg__['success']:
             code = 5
 
     if rspamc and code == 0:
+        out = out[0].decode(errors='ignore').strip()
         # sucessfully learned
         code = 5
         orig_code = 5
     if rspamc and code == 1:
+        out = out[0].decode(errors='ignore').strip()
         # already learned
         code = 6
         orig_code = 6
@@ -131,6 +132,9 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
         if rspamc:
             spamassassin_result = proc.communicate(imaputils.mail_content(mail))[0]
             returncode = utils.status_from_mail(spamassassin_result)
+            #spamassassin_result = spamassassin_result.decode(errors='ignore')
+            #SpamAssassin.logger.warning(spamassassin_result)
+            #SpamAssassin.logger.warning("result")
 
             # faking score; we don't need it for rspamc
             score = "2/5\n"
@@ -142,6 +146,7 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
             score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
     except Exception:  # pylint: disable=broad-except
+        raise Exception
         score = "-9999"
 
     return score, returncode, spamassassin_result
@@ -465,8 +470,10 @@ class SpamAssassin(object):
 
         # progressbar
         count = len(uids)
+        self.logger.info("Out of the loop")
         # Main loop that iterates over each new uid we haven't seen before
         for i in progressbar(range(count), "Scanning: ", 80, self.interactive):
+            self.logger.info("In the loop")
             # Retrieve the entire message
             mail = imaputils.get_message(self.imap, uids[i], sa_proc.uids,
                                          logger=self.logger)
@@ -490,7 +497,9 @@ class SpamAssassin(object):
                     code = 0
                 processednum = processednum + 1
             else:
+                self.logger.debug(__('Testing mail {}'.format(uids)))
                 score, code, spamassassin_result = test_mail(mail, self.spamc, self.rspamc, cmd=self.cmd_test)
+                self.logger.debug(__('Score {}'.format(score)))
                 if score == "-9999":
                     self.logger.exception(__(
                         '{} error for mail  22 {}'.format(self.cmd_test, uids[i])))
