@@ -93,12 +93,10 @@ def learn_mail(mail, learn_type, rspamc=False):
             code = 5
 
     if rspamc and code == 0:
-        out = out[0].decode(errors='ignore').strip()
         # sucessfully learned
         code = 5
         orig_code = 5
     if rspamc and code == 1:
-        out = out[0].decode(errors='ignore').strip()
         # already learned
         code = 6
         orig_code = 6
