@@ -36,10 +36,8 @@ from isbg import sa_unwrap
 from isbg import utils
 
 from .utils import __
-from .utils import progressbar
 
 import logging
-
 
 #: Used to detect already our successfully (un)learned messages.
 __spamc_msg__ = {
@@ -143,6 +141,7 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
             score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
     except Exception:  # pylint: disable=broad-except
+        raise Exception
         score = "-9999"
 
     return score, returncode, spamassassin_result
@@ -188,7 +187,7 @@ class SpamAssassin(object):
     _required_kwargs = []
 
     #: Key args that will be used.
-    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
+    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
                'noreport', 'spamflags', 'delete', 'expunge', 'rspamc']
@@ -221,8 +220,6 @@ class SpamAssassin(object):
         """Is the command that dumps out a munged message including report."""
         if self.spamc:  # pylint: disable=no-member
             return ["spamc"]
-        elif self.rspamc:
-            return ["rspamc", "-m"]
         return ["spamassassin"]
 
     @property
@@ -464,12 +461,10 @@ class SpamAssassin(object):
             fakespammax = 1
             processmax = 5
 
-        # progressbar
-        count = len(uids)
         # Main loop that iterates over each new uid we haven't seen before
-        for i in progressbar(range(count), "Scanning: ", 80, self.interactive):
+        for uid in uids:
             # Retrieve the entire message
-            mail = imaputils.get_message(self.imap, uids[i], sa_proc.uids,
+            mail = imaputils.get_message(self.imap, uid, sa_proc.uids,
                                          logger=self.logger)
 
             # Unwrap spamassassin reports
@@ -494,9 +489,9 @@ class SpamAssassin(object):
                 score, code, spamassassin_result = test_mail(mail, self.spamc, self.rspamc, cmd=self.cmd_test)
                 if score == "-9999":
                     self.logger.exception(__(
-                        '{} error for mail {}'.format(self.cmd_test, uids[i])))
+                        '{} error for mail {}'.format(self.cmd_test, uid)))
                     self.logger.debug(repr(mail))
-                    uids.remove(uids[i])
+                    uids.remove(uid)
                     continue
 
             if score == "0/0\n":
@@ -504,15 +499,14 @@ class SpamAssassin(object):
                                      "spamc -> spamd error - aborting")
 
             self.logger.debug(__(
-                "Score for uid {}: {}".format(uids[i], score.strip())))
+                "Score for uid {}: {}".format(uid, score.strip())))
 
             if code != 0:
                 # Message is spam, delete it or move it to spaminbox
                 # (optionally with report)
-                if not self._process_spam(uids[i], score, mail, spamdeletelist, code, spamassassin_result):
+                if not self._process_spam(uid, score, mail, spamdeletelist, code, spamassassin_result):
                     continue
-                spamlist.append(uids[i])
-
+                spamlist.append(uid)
 
         sa_proc.nummsg = len(uids)
         sa_proc.spamdeleted = len(spamdeletelist)
