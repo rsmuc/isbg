@@ -268,7 +268,7 @@ def status_from_mail(mail):
     """ Search the spam status """
     new_mail = email.message_from_string(mail.decode(errors='ignore'))
     spamstatus = new_mail.get("X-Spam")
-    if spamstatus == "Yes":
+    if spamstatus == "yes" or spamstatus == "Yes":
         return 1
     else:
         return 0
