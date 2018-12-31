@@ -139,7 +139,6 @@ def test_mail(mail, spamc=False, rspamc=False, cmd=False):
             score = utils.score_from_mail(spamassassin_result.decode(errors='ignore'))
 
     except Exception:  # pylint: disable=broad-except
-        raise Exception
         score = "-9999"
 
     return score, returncode, spamassassin_result
