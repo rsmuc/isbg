@@ -34,6 +34,7 @@ import isbg
 from isbg import imaputils
 from isbg import sa_unwrap
 from isbg import utils
+from .utils import printProgressBar
 
 from .utils import __
 
@@ -185,7 +186,7 @@ class SpamAssassin(object):
     _required_kwargs = []
 
     #: Key args that will be used.
-    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun',
+    _kwargs = ['imap', 'spamc', 'logger', 'partialrun', 'dryrun', 'interactive',
                'learnthendestroy', 'gmail', 'learnthenflag', 'learnunflagged',
                'learnflagged', 'deletehigherthan', 'imapsets', 'maxsize',
                'noreport', 'spamflags', 'delete', 'expunge', 'rspamc']
@@ -460,7 +461,9 @@ class SpamAssassin(object):
             processmax = 5
 
         # Main loop that iterates over each new uid we haven't seen before
-        for uid in uids:
+        for i, uid in enumerate(uids):
+            if self.interactive and len(uids) > 0:
+                printProgressBar(i, len(uids), prefix='Progress:', suffix='Complete', length=50)
             # Retrieve the entire message
             mail = imaputils.get_message(self.imap, uid, sa_proc.uids,
                                          logger=self.logger)
