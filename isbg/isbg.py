@@ -60,7 +60,7 @@ Note:
 """
 
 
-__version__ = "2.1.3"  #: The current isbg version
+__version__ = "2.1.4"  #: The current isbg version
 
 __license__ = \
     """License GPLv3: GNU GPL version 3 https://gnu.org/licenses/gpl.html
@@ -481,10 +481,9 @@ class ISBG(object):
     def do_list_imap(self):
         """List the imap boxes."""
         imap_list = self.imap.list()
-        dirlist = str([x.decode() for x in imap_list[1]])
-        # string formatting
-        dirlist = re.sub(r'\(.*?\)| \".\" \"|\"\', \'', " ", dirlist)
-        self.logger.info(dirlist)
+        for x in imap_list[1]:
+            x = re.sub(r'\(.*" (?=[a-zA-Z0-9])', "", x) # string formatting with
+            self.logger.info(x)                         # lookbehind regex
 
     def do_spamassassin(self):
         """Do the spamassassin procesing.
@@ -496,6 +495,7 @@ class ISBG(object):
 
         """
         sa = spamproc.SpamAssassin.create_from_isbg(self)
+        proc = None
 
         # SpamAssassin training: Learn spam
         s_learned = spamproc.Sa_Learn()

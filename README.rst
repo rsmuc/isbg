@@ -1,7 +1,7 @@
 IMAP Spam Begone
 ================
 
-**isbg** is a script and a python module that makes it easy to scan an
+**isbg** is a script and a python 3 module that makes it easy to scan an
 IMAP inbox for spam using *SpamAssassin* and get your spam moved to another
 folder.
 
@@ -16,6 +16,10 @@ You can read the full documentation in `Read the docs`_.
 
 .. contents:: Table of Contents
    :depth: 3
+
+Support
+-------
+Please note, the current release of isbg **only supports python 3**. Python 2 is compatile with older releases.
 
 Features
 --------
@@ -69,41 +73,54 @@ To run, ``isbg`` also depends on some python modules.
 .. _chardet: https://pypi.python.org/pypi/chardet
 .. _xdg: https://pypi.python.org/pypi/xdg
 
+Install via pip (easiest method)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install as user::
+
+    $ pip3 install isbg --user
+
+Install as root::
+
+    $ sudo pip3 install isbg
+
+To list the files installed::
+
+    $ pip3 show isbg --files
+
+And to uninstall it::
+
+    $ pip3 uninstall isbg
+
+.. _Pypi: https://pypi.python.org/pypi/isbg
 
 Install from source
 ~~~~~~~~~~~~~~~~~~~
 
-From the main directory where you have download isbg, run::
+Download a copy of the isbg repository onto your machine::
 
-    $ python setup.py install --record installed_files.txt
+    $ cd ~
+    $ git clone https://github.com/isbg/isbg.git
 
-It will install under ``/usr/local/``. In ``installed_files.txt`` there should
-be the list of files installed. To uninstall them, use::
+Install program dependencies::
+
+    $ cd /isbg
+    $ python3 setup.py install -r installed_files.txt
+
+Files will be installed under ``/usr/local/``. ``installed_files.txt`` contains a list of all the dependencies installed.
+
+Uninstall from souce
+~~~~~~~~~~~~~~~~~~~~
+
+Uninstall program dependencies::
 
     $ tr '\n' '\0' < installed_files.txt | xargs -0 rm -vf --
 
-In windows systems, you can build a windows installer using::
+Building Windows Installer
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    $ python setup.py bdist_wininst
+Run the following to build a windows installer::
 
-
-install with PyPi
-~~~~~~~~~~~~~~~~~
-
-You also can install **isbg** from `Pypi`_::
-
-    $ pip install isbg
-
-To see the files installed you can use::
-
-    $ pip show isbg --files
-
-And to uninstall it::
-
-    $ pip uninstall isbg
-
-.. _Pypi: https://pypi.python.org/pypi/isbg
-
+    $ python3 setup.py bdist_wininst
 
 Usage
 -----
@@ -128,7 +145,6 @@ You can also edit the system-wide settings in
 
 If you want to use the ``--learnspambox`` or ``--learnhambox``, you'll have
 to configure your spamassassin.
-
 
 Configure your spamassassin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
