@@ -65,6 +65,15 @@ class TestISBG(object):
         assert os.path.basename(filename) != ""
         assert os.path.basename(filename).startswith(".isbg-")
 
+    def test_do_spamassassin(self):
+        """Test teachonly in do_spamassassin."""
+        sbg = isbg.ISBG()
+        sbg.teachonly = True
+        teachonly = sbg.do_spamassassin()
+
+        assert teachonly == None
+
+
     def test_removelock(self):
         """Test removelock."""
         sbg = isbg.ISBG()
